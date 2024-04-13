@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keyboard Control for Moving Box</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-image: url(bg.jpg);
+            background-size: cover;
+        }
+
+        #player {
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2.5em;
+        }
+
+        #enemy {
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2.5em;
+        }
+
+        .bullet {
+            width: 5px;
+            height: 10px;
+            background-color: red;
+            position: absolute;
+            left: 50%;
+        }
+        #score{
+            font-size: 2em;
+            color: yellow  ;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="score">Score: 0</div>
+    <div id="player">&#x1F916;</div>
+    <div id="container"><div id="enemy">&#x1FAB2;</div></div>
+    <script>
+        const player = document.getElementById("player");
+        const bullet = document.getElementById("bullet");
+        const playerSpeed = 10;
+        const bulletSpeed = 5;
+        const bullets = [];
+        //const enemySize = 50;
+        let bulletInterval;
+
+        alert("遊戲方式：左右鍵控制移動，空白鍵發射子彈，獲得5分贏得勝利");
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "ArrowLeft") {
+                movePlayer(-playerSpeed, 0);
+            } else if (event.key === "ArrowRight") {
+                movePlayer(playerSpeed, 0);
+            } else if (event.key === " ") {
+                shootBullet();
+            }
+        });
+
+        function movePlayer(deltaX, deltaY) {
+            const playerRect = player.getBoundingClientRect();
+            const newX = playerRect.left + player.offsetWidth / 2 + deltaX; 
+
+            // 检查是否超出左右边界
+            if (newX -5 >= 0 && newX + 15 <= window.innerWidth) {
+                player.style.left = newX + "px";
+            }
+        }
+
+        function shootBullet() {
+            const bullet = document.createElement("div");
+            bullet.className = "bullet";
+            bullet.style.left = parseInt(player.style.left) + "px";
+            bullet.style.bottom = player.offsetHeight + "px";
+            document.body.appendChild(bullet);
+            bullets.push(bullet);
+
+            if (!bulletInterval) {
+                bulletInterval = setInterval(moveBullets, 1000 / 60); // 子彈速度，每秒60帧
+            }
+        }
+
+        let bulletsPerSecond = 5; // 每秒发射的子弹数量
+        let bulletCounter = 0; // 子弹计数器，用于跟踪每秒发射的子弹数量
+        let lastShotTime = Date.now(); // 上一次发射子弹的时间戳
+
+        function shootBullet() {
+            const currentTime = Date.now();
+            const elapsedTime = currentTime - lastShotTime;
+
+            // 计算每秒发射的子弹数量
+            const bulletsThisSecond = Math.floor((elapsedTime / 1000) * bulletsPerSecond);
+            
+            // 发射子弹
+            for (let i = 0; i < bulletsThisSecond; i++) {
+                const bullet = createBullet();
+                moveBullet(bullet);
+            }
+
+            // 更新上一次发射子弹的时间戳
+            lastShotTime = currentTime;
+        }
+
+        function createBullet() {
+            const bullet = document.createElement("div");
+            bullet.className = "bullet";
+            bullet.style.left = parseInt(player.style.left) + "px";
+            bullet.style.bottom = player.offsetHeight + "px";
+            document.body.appendChild(bullet);
+            bullets.push(bullet);
+            return bullet;
+        }
+
+        function moveBullet(bullet) {
+            // 移动子弹的逻辑
+        }
+
+        // 调用 shootBullet 函数以开始发射子弹
+        setInterval(shootBullet, 1000); // 每秒触发一次
+
+        function moveBullets() {
+        bullets.forEach(bullet => {
+            const bottom = parseInt(bullet.style.bottom);
+            bullet.style.bottom = bottom + bulletSpeed + "px";
+
+            if (bottom > window.innerHeight) {
+                bullet.remove();
+                bullets.splice(bullets.indexOf(bullet), 1);
+            } else {
+                // 检查子弹和敌人是否碰撞
+                const bulletRect = bullet.getBoundingClientRect();
+                const enemy = document.querySelector("#enemy");
+                const enemyRect = enemy.getBoundingClientRect();
+                if (
+                    bulletRect.left < enemyRect.right &&
+                    bulletRect.right > enemyRect.left &&
+                    bulletRect.top < enemyRect.bottom &&
+                    bulletRect.bottom > enemyRect.top
+                ) {
+                    // 碰撞发生，移除子弹和敌人
+                    bullet.remove();
+                    bullets.splice(bullets.indexOf(bullet), 1);
+                    enemy.remove();
+                    increaseScore();// 增加分数
+                    if(score >= 5){
+                        alert("YOU WIN");
+                    }
+                    generateEnemy();
+                }
+            }
+        });
+
+        if (bullets.length === 0) {
+            clearInterval(bulletInterval);
+            bulletInterval = null;
+        }
+    }
+
+    function generateEnemy() {
+        const enemy = document.createElement("div");
+        const container = document.getElementById("container");
+        enemy.id = "enemy";
+        enemy.textContent = "🪲";
+        enemy.style.left = Math.random() * (window.innerWidth - 50) + "px"; // 随机生成位置
+        container.appendChild(enemy);
+
+    }
+
+    let deltaX = 2;
+    //let enemy = generateEnemy(); // 生成新的敌人并赋值给 enemy
+        function moveEnemy() { 
+            const enemy = document.querySelector("#enemy");    
+            const enemyRect = enemy.getBoundingClientRect();                 
+            const newX = enemyRect.left + player.offsetWidth / 2 + deltaX;
+
+            // 超出边界折返方向
+            if (newX >= 0 && newX + 25 <= window.innerWidth) {
+                enemy.style.left = newX + deltaX + "px";
+            }
+            if (newX - 25 < 0 ) {
+                deltaX = 2;
+                }
+            if (newX + 25 > window.innerWidth) {
+                deltaX = -2;
+                } 
+                
+        }
+        
+        setInterval(moveEnemy, 50); // 每 100 毫秒移动一次
+
+    // 定义初始分数
+    let score = 0;
+
+    // 函数用于更新计分器显示
+    function updateScore() {
+        const scoreElement = document.getElementById("score");
+        scoreElement.textContent = "Score: " + score;
+    }
+
+    // 函数用于增加分数
+    function increaseScore() {
+        score += 1; // 增加 1 分
+        updateScore(); // 更新计分器显示
+        
+    }
+
+    </script>
+</body>
+
+</html>
