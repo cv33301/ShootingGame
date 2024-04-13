@@ -95,44 +95,6 @@
             }
         }
 
-        let bulletsPerSecond = 5; // 每秒发射的子弹数量
-        let bulletCounter = 0; // 子弹计数器，用于跟踪每秒发射的子弹数量
-        let lastShotTime = Date.now(); // 上一次发射子弹的时间戳
-
-        function shootBullet() {
-            const currentTime = Date.now();
-            const elapsedTime = currentTime - lastShotTime;
-
-            // 计算每秒发射的子弹数量
-            const bulletsThisSecond = Math.floor((elapsedTime / 1000) * bulletsPerSecond);
-            
-            // 发射子弹
-            for (let i = 0; i < bulletsThisSecond; i++) {
-                const bullet = createBullet();
-                moveBullet(bullet);
-            }
-
-            // 更新上一次发射子弹的时间戳
-            lastShotTime = currentTime;
-        }
-
-        function createBullet() {
-            const bullet = document.createElement("div");
-            bullet.className = "bullet";
-            bullet.style.left = parseInt(player.style.left) + "px";
-            bullet.style.bottom = player.offsetHeight + "px";
-            document.body.appendChild(bullet);
-            bullets.push(bullet);
-            return bullet;
-        }
-
-        function moveBullet(bullet) {
-            // 移动子弹的逻辑
-        }
-
-        // 调用 shootBullet 函数以开始发射子弹
-        setInterval(shootBullet, 1000); // 每秒触发一次
-
         function moveBullets() {
         bullets.forEach(bullet => {
             const bottom = parseInt(bullet.style.bottom);
