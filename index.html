@@ -51,7 +51,7 @@
 <body>
     <div id="score">Score: 0</div>
     <div id="player">&#x1F916;</div>
-    <div id="container"><div id="enemy">&#x1FAB2;</div></div>
+    <div id="container"><div id="enemy">&#128375;</div></div>
     <script>
         const player = document.getElementById("player");
         const bullet = document.getElementById("bullet");
@@ -137,7 +137,7 @@
         const enemy = document.createElement("div");
         const container = document.getElementById("container");
         enemy.id = "enemy";
-        enemy.textContent = "🪲";
+        enemy.textContent = '🕷';
         enemy.style.left = Math.random() * (window.innerWidth - 50) + "px"; // 随机生成位置
         container.appendChild(enemy);
 
